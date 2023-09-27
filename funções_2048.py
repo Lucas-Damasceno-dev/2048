@@ -41,7 +41,7 @@ def add_random_tile(board):
         i, j = random.choice(empty_cells)
         
         # Define o valor da célula como 2 (90% de chance) ou 4 (10% de chance).
-        board[i][j] = 2 if random.random() < 0.9 else 4
+        board[i][j] = 1024 if random.random() < 0.9 else 1024
 
 
 def print_colored_board(board):
@@ -293,68 +293,77 @@ def input_direction():
             print("Invalid input. Use W/A/S/D to move or R to restart.")
 
 
-def stop_condition(board):
+def stop_condition(board, score, move_count, game_history=None):
     """
-    Determina se o jogo terminou e se o jogador deseja jogar novamente.
+    Determine if the game has ended and whether the player wants to play again.
 
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
+        score (int): The player's current score.
+        move_count (int): The number of moves made.
+        game_history (list, optional): The list to store game history.
 
     Returns:
-        bool: True se o jogador deseja parar o jogo, False se deseja continuar.
+        bool: True if the player wants to stop playing, False if they want to continue.
     """
-    # Verifica se o jogo terminou (perda ou vitória) e solicita ao jogador para jogar novamente.
     print("Game Over! You Lose!" if is_game_over(board) else "Congratulations! You Win!")
+    
+    if game_history is not None:
+        game_history.append({"score": score, "moves": move_count})  # Add game data to history
+    
     restart = input("Do you want to play again? (Y/N): ").upper()
     while restart not in "YN":
         restart = input("Do you want to play again? (Y/N): ").upper()
     return restart == 'N'
 
 
-def display_score_history(score_history, move_count_history):
+def stop_condition(board, score, move_count, game_history):
     """
-    Exibe o histórico de pontos e jogadas dos jogadores durante o jogo de 2048.
+    Determine if the game has ended and whether the player wants to play again.
 
     Args:
-        score_history (list): Uma lista de pontuações ao longo do jogo.
-        move_count_history (list): Uma lista do número de jogadas ao longo do jogo.
-    """
-    print("Score and Move History:")
-    for i, (score, move_count) in enumerate(zip(score_history, move_count_history)):
-        player_number = i + 1  # Número do jogador
-        print(f"Player {player_number}: {score} points in {move_count} moves")
-
-# Exemplo de uso no seu jogo de 2048:
-score_history = [200, 350, 150]  # Substitua pelas pontuações dos jogadores
-move_count_history = [50, 80, 60]  # Substitua pelo número de jogadas dos jogadores
-
-display_score_history(score_history, move_count_history)
-
-
-def play_game():
-    """
-    Função principal que controla o jogo 2048.
+        board (list): The game board represented as a 2D list.
+        score (int): The player's current score.
+        move_count (int): The number of moves made.
+        game_history (list): The list to store game history.
 
     Returns:
-        bool: True se o jogador deseja reiniciar o jogo, False se deseja encerrar o programa.
+        bool: True if the player wants to stop playing, False if they want to continue.
+    """
+    print("Game Over! You Lose!" if is_game_over(board) else "Congratulations! You Win!")
+    
+    game_history.append({"score": score, "moves": move_count})  # Add game data to history
+    
+    restart = input("Do you want to play again? (Y/N): ").upper()
+    while restart not in "YN":
+        restart = input("Do you want to play again? (Y/N): ").upper()
+    return restart == 'N'
+
+
+def play_game(game_history):
+    """
+    The main game loop.
+
+    Args:
+        game_history (list): The list to store game history.
+
+    Returns:
+        bool: True if the player wants to restart the game, False if they want to quit.
     """
     board = initialize_board()
     score = 0
     move_count = 0
-    score_history = []
-    move_count_history = []
 
     while True:
         print_colored_board(board)
         print("Score:", score)
         print("Moves:", move_count)
         
-        # Verifica se o jogo foi ganho ou perdido.
         if is_game_won(board) or is_game_over(board):
-            if stop_condition(board):
+            if stop_condition(board, score, move_count, game_history):
                 break
             else:
-                # Reinicia o jogo.
+                # Restart the game.
                 board = initialize_board()
                 score = 0
                 move_count = 0
@@ -371,25 +380,36 @@ def play_game():
         elif direction == 'D':
             moved, move_score = move_right(board)
         elif direction == 'R':
-            return True  
+            if stop_condition(board, score, move_count, game_history):
+                break
+            else:
+                # Restart the game.
+                board = initialize_board()
+                score = 0
+                move_count = 0
+                continue
 
         if moved:
             add_random_tile(board)
             move_count += 1
             score += move_score
-            score_history.append(score)
-            move_count_history.append(move_count)
-
-    return False
 
 
 def main():
     """
-    Função principal que inicia o jogo 2048.
+    The main function that starts the 2048 game.
 
-    A função continua a execução do jogo até que o jogador escolha não reiniciar.
+    The function continues the game execution until the player chooses not to restart.
     """
+    game_history = []  # Initialize the game history list
+    
     while True:
-        should_restart = play_game()
+        should_restart = play_game(game_history)
         if not should_restart:
             break
+
+    # Display the game history
+    print("Game History:")
+    for i, game_data in enumerate(game_history, start=1):
+        print(f"Game {i}: Score = {game_data['score']}, Moves = {game_data['moves']}")
+    
