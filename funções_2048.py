@@ -41,7 +41,7 @@ def add_random_tile(board):
         i, j = random.choice(empty_cells)
         
         # Define o valor da célula como 2 (90% de chance) ou 4 (10% de chance).
-        board[i][j] = 1024 if random.random() < 0.9 else 1024
+        board[i][j] = 2 if random.random() < 0.9 else 4
 
 
 def print_colored_board(board):
@@ -330,14 +330,18 @@ def stop_condition(board, score, move_count, game_history):
     Returns:
         bool: True if the player wants to stop playing, False if they want to continue.
     """
-    print("Game Over! You Lose!" if is_game_over(board) else "Congratulations! You Win!")
-    
+    if is_game_over(board):
+        print("Game Over! You Lose!")
+    elif is_game_won(board):
+        print("Congratulations! You Win!")
+
     game_history.append({"score": score, "moves": move_count})  # Add game data to history
     
     restart = input("Do you want to play again? (Y/N): ").upper()
     while restart not in "YN":
         restart = input("Do you want to play again? (Y/N): ").upper()
     return restart == 'N'
+
 
 
 def play_game(game_history):
@@ -393,23 +397,4 @@ def play_game(game_history):
             add_random_tile(board)
             move_count += 1
             score += move_score
-
-
-def main():
-    """
-    The main function that starts the 2048 game.
-
-    The function continues the game execution until the player chooses not to restart.
-    """
-    game_history = []  # Initialize the game history list
-    
-    while True:
-        should_restart = play_game(game_history)
-        if not should_restart:
-            break
-
-    # Display the game history
-    print("Game History:")
-    for i, game_data in enumerate(game_history, start=1):
-        print(f"Game {i}: Score = {game_data['score']}, Moves = {game_data['moves']}")
-    
+            
