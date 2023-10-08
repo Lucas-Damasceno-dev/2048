@@ -4,22 +4,22 @@ import random
 
 def clear_screen():
     """
-    Limpa a tela do console, funcionando em sistemas Windows e Unix-like.
+    Clears the console screen, works on both Windows and Unix-like systems.
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def initialize_board():
     """
-    Inicializa o tabuleiro 4x4 do jogo 2048 com dois valores aleatórios.
+    Initializes the 4x4 game board of 2048 with two random values.
     
-    Retorna:
-        list: Uma lista 2D representando o tabuleiro.
+    Returns:
+        list: A 2D list representing the board.
     """
-    # Cria uma matriz 4x4 preenchida com zeros para representar o tabuleiro vazio.
+    # Creates a 4x4 matrix filled with zeros to represent the empty board.
     board = [[0] * 4 for _ in range(4)]
     
-    # Adiciona dois valores aleatórios (2 ou 4) ao tabuleiro.
+    # Adds two random values (2 or 4) to the board.
     add_random_tile(board)
     add_random_tile(board)
     
@@ -28,28 +28,28 @@ def initialize_board():
 
 def add_random_tile(board):
     """
-    Adiciona um novo valor (2 ou 4 com probabilidades diferentes) em uma posição aleatória vazia no tabuleiro.
+    Adds a new value (2 or 4 with different probabilities) to a random empty position on the board.
 
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
     """
-    # Encontra as células vazias no tabuleiro (células com valor 0).
+    # Finds the empty cells on the board (cells with value 0).
     empty_cells = [(i, j) for i in range(4) for j in range(4) if board[i][j] == 0]
     
     if empty_cells:
-        # Escolhe uma célula vazia aleatória.
+        # Chooses a random empty cell.
         i, j = random.choice(empty_cells)
         
-        # Define o valor da célula como 2 (90% de chance) ou 4 (10% de chance).
+        # Sets the cell value to 2 (90% chance) or 4 (10% chance).
         board[i][j] = 2 if random.random() < 0.9 else 4
 
 
 def print_colored_board(board):
     """
-    Imprime o tabuleiro 2048 colorido no console.
+    Prints the colored 2048 board on the console.
 
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
     """
     clear_screen()
     board_size = len(board)
@@ -59,12 +59,12 @@ def print_colored_board(board):
     total_width = board_size * (cell_width + 4)
     title_padding = (total_width - len(title)) // 2
 
-    # Imprime as linhas superiores do tabuleiro.
+    # Prints the upper lines of the board.
     print("\033[1;37m+" + "+".join(["-" * cell_width] * board_size) + "+\033[0m")
     print(f"\033[1;37m|{' ' * (title_padding - 1)}{title}{' ' * (title_padding - 1 + len(title) % 2)}|\033[0m")
 
     for i in range(board_size):
-        # Imprime as linhas intermediárias do tabuleiro.
+        # Prints the intermediate lines of the board.
         print("\033[1;37m+" + "+".join(["-" * cell_width] * board_size) + "+\033[0m")
         for j in range(board_size):
             cell_value = board[i][j]
@@ -72,21 +72,21 @@ def print_colored_board(board):
 
             if cell_value == 0:
                 cell_color = "\033[0m"
-            elif 1 <= len(str(cell_value)) <= 2:
-                cell_color = "\033[1;37m"  # Pinta os valores de apenas 1 digito de branco
-            elif 3 <= len(str(cell_value)) <= 4:
-                cell_color = "\033[1;34m" # Pinta os valores de apenas 2 digitos de azul
-            elif 5 <= len(str(cell_value)) <= 6:
-                cell_color = "\033[1;32m" # Pinta os valores de apenas 3 digitos de verde
-            elif 7 <= len(str(cell_value)):
-                cell_color = "\033[1;31m"  # Pinta os valores de apenas 4 digitos de vermelho
+            elif len(str(cell_value)) == 1:
+                cell_color = "\033[1;37m"
+            elif len(str(cell_value)) == 2:
+                cell_color = "\033[1;34m"
+            elif len(str(cell_value)) == 3:
+                cell_color = "\033[1;32m"
+            elif len(str(cell_value)) == 4:
+                cell_color = "\033[1;31m"
 
             padding_left = " " * ((cell_width - len(cell_str)) // 2)
             padding_right = " " * (cell_width - len(cell_str) - len(padding_left))
 
-            # Imprime cada célula do tabuleiro com cor e espaçamento adequados.
+            # Prints each cell of the board with the appropriate color and spacing.
             print(f"\033[1;37m|{padding_left}{cell_color}{cell_str}{padding_right}\033[0m", end="")
-        # Imprime as linhas inferiores do tabuleiro.
+        # Prints the lower lines of the board.
         print("\033[1;37m|\033[0m")
     print("\033[1;37m+" + "+".join(["-" * cell_width] * board_size) + "+\033[0m")
     print("\n")
@@ -94,71 +94,71 @@ def print_colored_board(board):
 
 def move_left(board):
     """
-    Move as peças no tabuleiro para a esquerda, mesclando as que são iguais ao se mover.
+    Moves the tiles on the board to the left, merging those that are equal while moving.
     
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
 
     Returns:
-        tuple: Uma tupla contendo um booleano que indica se houve movimento e a pontuação total da mesclagem.
+        tuple: A tuple containing a boolean indicating if there was a movement and the total score of the merge.
     """
     moved = False
     total_score = 0
     for row in board:
         initial_row = row.copy()
         
-        # Chama a função merge_tiles para mesclar as peças na linha.
+        # Calls the merge_tiles function to merge the tiles in the row.
         merged_row, merge_score = merge_tiles(row)
         
         row[:] = merged_row
         
-        # Verifica se houve movimento na linha.
+        # Checks if there was movement in the row.
         if row != initial_row:
             moved = True
         
-        # Atualiza a pontuação total com a pontuação da mesclagem.
+        # Updates the total score with the merge score.
         total_score += merge_score  
     return moved, total_score  
 
 
 def move_right(board):
     """
-    Move as peças no tabuleiro para a direita, mesclando as que são iguais ao se mover.
+    Moves the tiles on the board to the right, merging those that are equal while moving.
     
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
 
     Returns:
-        tuple: Uma tupla contendo um booleano que indica se houve movimento e a pontuação total da mesclagem.
+        tuple: A tuple containing a boolean indicating if there was a movement and the total score of the merge.
     """
     moved = False
     total_score = 0
     for row in board:
         initial_row = row.copy()
         
-        # Inverte a ordem das peças na linha antes de chamar merge_tiles.
+        # Reverses the order of the tiles in the row before calling merge_tiles.
         merged_row, merge_score = merge_tiles(row[::-1])
         
         row[:] = merged_row[::-1]
         
-         # Verifica se houve movimento na linha.
+         # Checks if there was movement in the row.
         if row != initial_row:
             moved = True
             
-        # Atualiza a pontuação total com a pontuação da mesclagem.
+        # Updates the total score with the merge score.
         total_score += merge_score
     return moved, total_score
 
 
 def move_up(board):
     """
-    Move as peças no tabuleiro para cima, mesclando as que são iguais ao se mover.
+    Moves the tiles on the board upward, merging those that are equal while moving.
     
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
 
     Returns:
-        tuple: Uma tupla contendo um booleano que indica se houve movimento e a pontuação total da mesclagem.
+        tuple: A tuple containing a boolean indicating if there was a movement and the total score of the merge.
     """
     moved = False
     total_score = 0
@@ -166,30 +166,30 @@ def move_up(board):
         column = [board[row][col] for row in range(4)]
         initial_column = column.copy()
         
-        # Chama a função merge_tiles para mesclar as peças na coluna.
+        # Calls the merge_tiles function to merge the tiles in the column.
         merged_column, merge_score = merge_tiles(column)
         
         for row in range(4):
             board[row][col] = merged_column[row]
         
-        # Verifica se houve movimento na coluna.
+        # Checks if there was movement in the column.
         if any(board[row][col] != initial_column[row] for row in range(4)):
             moved = True
         
-        # Atualiza a pontuação total com a pontuação da mesclagem.
+        # Updates the total score with the merge score.
         total_score += merge_score
     return moved, total_score
 
 
 def move_down(board):
     """
-    Move as peças no tabuleiro para baixo, mesclando as que são iguais ao se mover.
+    Moves the tiles on the board downward, merging those that are equal while moving.
     
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
 
     Returns:
-        tuple: Uma tupla contendo um booleano que indica se houve movimento e a pontuação total da mesclagem.
+        tuple: A tuple containing a boolean indicating if there was a movement and the total score of the merge.
     """
     moved = False
     total_score = 0
@@ -197,36 +197,36 @@ def move_down(board):
         column = [board[row][col] for row in range(3, -1, -1)]
         initial_column = column.copy()
         
-        # Chama a função merge_tiles para mesclar as peças na coluna.
+        # Calls the merge_tiles function to merge the tiles in the column.
         merged_column, merge_score = merge_tiles(column)
         
         for row in range(3, -1, -1):
             board[3 - row][col] = merged_column[row]
         
-        # Verifica se houve movimento na coluna.
+        # Checks if there was movement in the column.
         if any(board[row][col] != initial_column[3 - row] for row in range(4)):
             moved = True
         
-        # Atualiza a pontuação total com a pontuação da mesclagem.
+        # Updates the total score with the merge score.
         total_score += merge_score
     return moved, total_score
 
 
 def merge_tiles(line):
     """
-    Mescla as peças na linha (ou coluna) de acordo com as regras do jogo 2048.
+    Merges the tiles in the line (or column) according to the rules of the 2048 game.
     
     Args:
-        line (list): Uma lista representando a linha (ou coluna) do tabuleiro.
+        line (list): A list representing the line (or column) of the board.
 
     Returns:
-        tuple: Uma tupla contendo a linha mesclada e a pontuação da mesclagem.
+        tuple: A tuple containing the merged line and the merge score.
     """
     merged_line = [0] * 4
     index = 0
     merge_score = 0  
     
-    # Itera sobre as peças na linha.
+    # Iterates over the tiles in the line.
     for tile in line:
         if tile != 0:
             if merged_line[index] == 0:
@@ -244,16 +244,16 @@ def merge_tiles(line):
 
 def is_game_won(board, target_value=2048):
     """
-    Verifica se o jogador ganhou o jogo alcançando um valor de peça alvo.
+    Checks if the player has won the game by reaching a target tile value.
 
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
-        target_value (int): O valor alvo para ganhar o jogo (padrão é 2048).
+        board (list): The game board represented as a 2D list.
+        target_value (int): The target value to win the game (default is 2048).
 
     Returns:
-        bool: True se o jogador ganhou, False caso contrário.
+        bool: True if the player has won, False otherwise.
     """
-    # Verifica se há alguma célula no tabuleiro com o valor alvo.
+    # Checks if there is any cell on the board with the target value.
     for row in board:
         if any(cell == target_value for cell in row):
             return True
@@ -262,15 +262,15 @@ def is_game_won(board, target_value=2048):
 
 def is_game_over(board):
     """
-    Verifica se o jogo chegou ao fim (sem movimentos válidos restantes).
+    Checks if the game has ended (no valid moves left).
 
     Args:
-        board (list): O tabuleiro do jogo representado como uma lista 2D.
+        board (list): The game board represented as a 2D list.
 
     Returns:
-        bool: True se o jogo acabou, False caso contrário.
+        bool: True if the game is over, False otherwise.
     """
-    # Testa cada uma das quatro direções possíveis para verificar se ainda há movimentos válidos.
+    # Tests each of the four possible directions to check if there are still valid moves.
     for move_func in [move_left, move_right, move_up, move_down]:
         board_copy = [row[:] for row in board]
         if move_func(board_copy):
@@ -280,10 +280,10 @@ def is_game_over(board):
             
 def input_direction():
     """
-    Solicita e retorna a direção do jogador como entrada (W/A/S/D para movimento, R para reiniciar).
+    Asks and returns the player's direction as input (W/A/S/D for movement, R for restart).
 
     Returns:
-        str: A direção escolhida pelo jogador.
+        str: The direction chosen by the player.
     """
     while True:
         direction = input("Enter direction (W/A/S/D): ").upper()
@@ -293,33 +293,9 @@ def input_direction():
             print("Invalid input. Use W/A/S/D to move or R to restart.")
 
 
-def stop_condition(board, score, move_count, game_history=None):
-    """
-    Determine if the game has ended and whether the player wants to play again.
-
-    Args:
-        board (list): The game board represented as a 2D list.
-        score (int): The player's current score.
-        move_count (int): The number of moves made.
-        game_history (list, optional): The list to store game history.
-
-    Returns:
-        bool: True if the player wants to stop playing, False if they want to continue.
-    """
-    print("Game Over! You Lose!" if is_game_over(board) else "Congratulations! You Win!")
-    
-    if game_history is not None:
-        game_history.append({"score": score, "moves": move_count})  # Add game data to history
-    
-    restart = input("Do you want to play again? (Y/N): ").upper()
-    while restart not in "YN":
-        restart = input("Do you want to play again? (Y/N): ").upper()
-    return restart == 'N'
-
-
 def stop_condition(board, score, move_count, game_history):
     """
-    Determine if the game has ended and whether the player wants to play again.
+    Determines if the game has ended and whether the player wants to play again.
 
     Args:
         board (list): The game board represented as a 2D list.
@@ -341,7 +317,6 @@ def stop_condition(board, score, move_count, game_history):
     while restart not in "YN":
         restart = input("Do you want to play again? (Y/N): ").upper()
     return restart == 'N'
-
 
 
 def play_game(game_history):
@@ -397,4 +372,3 @@ def play_game(game_history):
             add_random_tile(board)
             move_count += 1
             score += move_score
-            

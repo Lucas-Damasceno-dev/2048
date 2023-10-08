@@ -1,5 +1,6 @@
 from funções_2048 import play_game
 
+
 def main():
     """
     The main function that starts the 2048 game.
