@@ -41,4 +41,4 @@ Este projeto está licenciado sob a MIT License.
 Aos criadores do jogo 2048 por nos fornecerem uma divertida forma de passar o tempo.
 A todos os colaboradores que ajudaram a melhorar este jogo.
 ## Contato
-- Para mais informações ou perguntas, entre em contato com seu_email@example.com.
+- Para mais informações ou perguntas, entre em contato com lucas.damasceno.dev@gmail.com.
